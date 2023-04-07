@@ -35,7 +35,56 @@ En esta práctica vamos a profundizar en los conceptos explicados en clase, sobr
 
 ## Ejercicios propuestos
 ### Ejercicio 1
+#### Traza de ejecución
+Ejecutamos el programa, inicialmente con todos los registros vacios. Vamos a ejecutar el programa con un archivo existente y que se pasa correctamente por parametros, por lo que pasamos a la linea 8 directamente, a la llamada del `access`.
+```markdown
+Pila de llamadas:
+- access
+Registro de eventos de la API:
+- vacio
+Cola de manejadores:
+- vacio
 
+Console:
+> Starting to watch file helloworld.txt
+> File helloworld.txt is no longer watched
+```
+
+Como no se ha producido ninguna modificación en el fichero hasta ahora solo tenemos la llamada a `access`. A continuación, realizamos la primera modificación en el archivo `helloworld.txt`.
+```markdown
+Pila de llamadas:
+- watch
+- access
+Registro de eventos de la API:
+- change (callback de watch)
+Cola de manejadores:
+- vacio
+
+Console:
+> File helloworld.txt has been modified somehow
+```
+
+En este punto ya se introduce a la pila de llamadas la función `watch` tras la modificación y se añade al registro de eventos de la API a la callback `change`. Ahora, realizamos la segunda modificación del archivo `helloworld.txt`.
+```markdown
+Pila de llamadas:
+- watch
+- access
+Registro de eventos de la API:
+- change (callback del segundo watch)
+Cola de manejadores:
+- change (callback del primer watch)
+
+Console:
+> File helloworld.txt has been modified somehow
+```
+
+Aquí, ya pasado un tiempo, el primer manejador de `change` ya se ha movido a la cola, y se ha añadido un nuevo manejador `change` con la nueva modificación al registro de eventos de la API.
+
+#### ¿Qué hace la función access? 
+La función `access` se utiliza para comprobar si un archivo existe y si es accesible para el proceso en ejecución, esta prueba los permisos del usuario para el archivo o directorio especificado en la ruta `path`. En este caso, comprueba si el archivo proporcionado existe, antes de empezar a vigilarlo para detectar cambios.
+
+#### ¿Para qué sirve el objeto constants?
+El objeto constants es un entero opcional que especifica las verificaciones de accesibilidad que se deben realizar, como por ejemplo, los modos de apertura de archivos o los permisos de acceso. En este caso, se utiliza la constante `F_OK`, que indica que el archivo es visible para el proceso que lo llama, pero no dice nada sobre los permisos *rwx*. Esto es util para indicar que solo se desea comprobar la existencia del archivo.
 
 
 

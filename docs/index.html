@@ -68,6 +68,30 @@
   <h3>Ejercicio 1</h3>
 </a>
 
+<a href="#traza-de-ejecución" id="traza-de-ejecución" style="color: inherit; text-decoration: none;">
+  <h4>Traza de ejecución</h4>
+</a>
+<p>Ejecutamos el programa, inicialmente con todos los registros vacios. Vamos a ejecutar el programa con un archivo existente y que se pasa correctamente por parametros, por lo que pasamos a la linea 8 directamente, a la llamada del <code>access</code>.</p>
+<pre><code class="language-markdown"><span class="hl-0">Pila de llamadas:</span><br/><span class="hl-1">-</span><span class="hl-0"> access</span><br/><span class="hl-0">Registro de eventos de la API:</span><br/><span class="hl-1">-</span><span class="hl-0"> vacio</span><br/><span class="hl-0">Cola de manejadores:</span><br/><span class="hl-1">-</span><span class="hl-0"> vacio</span><br/><br/><span class="hl-0">Console:</span><br/><span class="hl-2">&gt;</span><span class="hl-0"> Starting to watch file helloworld.txt</span><br/><span class="hl-2">&gt;</span><span class="hl-0"> File helloworld.txt is no longer watched</span>
+</code></pre>
+<p>Como no se ha producido ninguna modificación en el fichero hasta ahora solo tenemos la llamada a <code>access</code>. A continuación, realizamos la primera modificación en el archivo <code>helloworld.txt</code>.</p>
+<pre><code class="language-markdown"><span class="hl-0">Pila de llamadas:</span><br/><span class="hl-1">-</span><span class="hl-0"> watch</span><br/><span class="hl-1">-</span><span class="hl-0"> access</span><br/><span class="hl-0">Registro de eventos de la API:</span><br/><span class="hl-1">-</span><span class="hl-0"> change (callback de watch)</span><br/><span class="hl-0">Cola de manejadores:</span><br/><span class="hl-1">-</span><span class="hl-0"> vacio</span><br/><br/><span class="hl-0">Console:</span><br/><span class="hl-2">&gt;</span><span class="hl-0"> File helloworld.txt has been modified somehow</span>
+</code></pre>
+<p>En este punto ya se introduce a la pila de llamadas la función <code>watch</code> tras la modificación y se añade al registro de eventos de la API a la callback <code>change</code>. Ahora, realizamos la segunda modificación del archivo <code>helloworld.txt</code>.</p>
+<pre><code class="language-markdown"><span class="hl-0">Pila de llamadas:</span><br/><span class="hl-1">-</span><span class="hl-0"> watch</span><br/><span class="hl-1">-</span><span class="hl-0"> access</span><br/><span class="hl-0">Registro de eventos de la API:</span><br/><span class="hl-1">-</span><span class="hl-0"> change (callback del segundo watch)</span><br/><span class="hl-0">Cola de manejadores:</span><br/><span class="hl-1">-</span><span class="hl-0"> change (callback del primer watch)</span><br/><br/><span class="hl-0">Console:</span><br/><span class="hl-2">&gt;</span><span class="hl-0"> File helloworld.txt has been modified somehow</span>
+</code></pre>
+<p>Aquí, ya pasado un tiempo, el primer manejador de <code>change</code> ya se ha movido a la cola, y se ha añadido un nuevo manejador <code>change</code> con la nueva modificación al registro de eventos de la API.</p>
+
+<a href="#¿qué-hace-la-función-access" id="¿qué-hace-la-función-access" style="color: inherit; text-decoration: none;">
+  <h4>¿Qué hace la función access?</h4>
+</a>
+<p>La función <code>access</code> se utiliza para comprobar si un archivo existe y si es accesible para el proceso en ejecución, esta prueba los permisos del usuario para el archivo o directorio especificado en la ruta <code>path</code>. En este caso, comprueba si el archivo proporcionado existe, antes de empezar a vigilarlo para detectar cambios.</p>
+
+<a href="#¿para-qué-sirve-el-objeto-constants" id="¿para-qué-sirve-el-objeto-constants" style="color: inherit; text-decoration: none;">
+  <h4>¿Para qué sirve el objeto constants?</h4>
+</a>
+<p>El objeto constants es un entero opcional que especifica las verificaciones de accesibilidad que se deben realizar, como por ejemplo, los modos de apertura de archivos o los permisos de acceso. En este caso, se utiliza la constante <code>F_OK</code>, que indica que el archivo es visible para el proceso que lo llama, pero no dice nada sobre los permisos <em>rwx</em>. Esto es util para indicar que solo se desea comprobar la existencia del archivo.</p>
+
 <a href="#ejercicio-modificación" id="ejercicio-modificación" style="color: inherit; text-decoration: none;">
   <h2>Ejercicio Modificación</h2>
 </a>
