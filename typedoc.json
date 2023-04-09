@@ -1,6 +1,8 @@
 {
   "entryPoints": [
-    "./src/index.ts",
+    "./src/ejercicio-2/index.ts",
+    "./src/ejercicio-2/wcConPipe.ts",
+    "./src/ejercicio-2/wcSinPipe.ts"
   ],
   "out": "./docs" 
 }
