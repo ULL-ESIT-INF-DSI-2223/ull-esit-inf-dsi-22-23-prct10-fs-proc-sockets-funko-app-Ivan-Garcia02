@@ -36,7 +36,7 @@ En esta práctica vamos a profundizar en los conceptos explicados en clase, sobr
 ## Ejercicios propuestos
 ### Ejercicio 1
 #### Traza de ejecución
-Ejecutamos el programa, inicialmente con todos los registros vacios. Vamos a ejecutar el programa con un archivo existente y que se pasa correctamente por parametros, por lo que pasamos a la linea 8 directamente, a la llamada del `access`.
+Ejecutamos el programa, inicialmente con todos los registros vacíos. Vamos a ejecutar el programa con un archivo existente y que se pasa correctamente por parámetros, por lo que pasamos a la línea 8 directamente, a la llamada del `access`.
 ```markdown
 Pila de llamadas:
 - access

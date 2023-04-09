@@ -1,0 +1,3 @@
+Fichero de texto para probar los programas
+tiene varias lineas al menos 
+tres lineas
