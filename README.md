@@ -88,19 +88,19 @@ El objeto constants es un entero opcional que especifica las verificaciones de a
 
 
 ### Ejercicio 2
-Para este ejercicio nos pedian implementar una aplicación que proporcione información sobre el número de líneas, palabras o caracteres que contiene un fichero de texto. Hemos hecho dos funciones una haciendo uso del método `pipe` de un `Stream` y otra sin hacer uso de este.
+Para este ejercicio nos pedían implementar una aplicación que proporcione información sobre el número de líneas, palabras o caracteres que contiene un fichero de texto. Hemos hecho dos funciones una haciendo uso del método `pipe` de un `Stream` y otra sin hacer uso de este.
 
-En ambas funciones los parametros que se pasan como argumento son el fichero a analizar y las opciones (Información de lineas y/o palabras y/o caracteres además del fichero de nuevo). Al comienzo de las funciones lo primero que hacemos en ambas es comprobar que tenemos acceso al fichero con la función asincrona `access`. En caso de no tener acceso, se emite un mensaje de error y en caso de tener acceso al fichero si implementa la apliciacion según con `pipe` o no.
+En ambas funciones los parámetros que se pasan como argumento son el fichero a analizar y las opciones (Información de líneas y/o palabras y/o caracteres además del fichero de nuevo). Al comienzo de las funciones lo primero que hacemos en ambas es comprobar que tenemos acceso al fichero con la función asincrona `access`. En caso de no tener acceso, se emite un mensaje de error y en caso de tener acceso al fichero si implementa la aplicación según con `pipe` o no.
 
 #### wcConPipe
-Para esta función lo primero que hacemos es crear el proceso con `spawn`, en el que indicamos que queremos usar el comando `wc` con las opciones indicadas por parametros. A continuación, redirigimos la salida del proceso `wc` a la estandar de consola con un `pipe`.
+Para esta función lo primero que hacemos es crear el proceso con `spawn`, en el que indicamos que queremos usar el comando `wc` con las opciones indicadas por parámetros. A continuación, redirigimos la salida del proceso `wc` a la estándar de consola con un `pipe`.
 ```typescript
 const wc = spawn('wc', options);
 wc.stdout.pipe(process.stdout);
 ```
 
 #### wcSinPipe
-Para esta función lo primero que hacemos tambien será crear el proceso con `spawn`, en el que indicamos que queremos usar el comando `wc` con las opciones indicadas por parametros. A continuación, creamos la variable `wcOutput` que vamos a utilizar para ir almacenando el contenido del stream `wc`, con el evento `data`. Despues, con el evento `close`, separamos la variable `wcOutput` en un array para trabajar mejor y según las opciones seleccionadas imprimir la información del fichero.
+Para esta función lo primero que hacemos también será crear el proceso con `spawn`, en el que indicamos que queremos usar el comando `wc` con las opciones indicadas por parámetros. A continuación, creamos la variable `wcOutput` que vamos a utilizar para ir almacenando el contenido del stream `wc`, con el evento `data`. Después, con el evento `close`, separamos la variable `wcOutput` en un array para trabajar mejor y según las opciones seleccionadas imprimir la información del fichero.
 ```typescript
 const wc = spawn('wc', options);
 
@@ -135,7 +135,7 @@ wc.on('close', () => {
 #### index.ts
 En este fichero definiremos el código encargado de la interacción con el usuario a través de la línea de comandos, para ello vamos a hacer uso del paquete `yargs`.
 
-Definimos un comando que es `wc` y que pide un fichero `file` y como opcionales se pueden poner las opciones de `lines`, `words` y `chars`. Según las opciones indicadas, se incluyen en un vector para despues llamar a las funciones `wcConPipe` y `wcSinPipe`, con el fichero y las opciones seleccionadas.
+Definimos un comando que es `wc` y que pide un fichero `file` y como opcionales se pueden poner las opciones de `lines`, `words` y `chars`. Según las opciones indicadas, se incluyen en un vector para después llamar a las funciones `wcConPipe` y `wcSinPipe`, con el fichero y las opciones seleccionadas.
 
 
 
