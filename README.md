@@ -21,8 +21,8 @@
 ## Índice
 - [Objetivos](#objetivos-de-la-práctica)
 - [Ejercicios propuestos](#ejercicios-propuestos)
-  - [Ejercicio 1]()
-  - [Ejercicio 2]()
+  - [Ejercicio 1](#ejercicio-1)
+  - [Ejercicio 2](#ejercicio-2)
   - [Ejercicio 3]()
 - [Ejercicio modificación](#ejercicio-modificación)
 - [Conclusiones](#conclusiones)
@@ -85,6 +85,57 @@ La función `access` se utiliza para comprobar si un archivo existe y si es acce
 
 #### ¿Para qué sirve el objeto constants?
 El objeto constants es un entero opcional que especifica las verificaciones de accesibilidad que se deben realizar, como por ejemplo, los modos de apertura de archivos o los permisos de acceso. En este caso, se utiliza la constante `F_OK`, que indica que el archivo es visible para el proceso que lo llama, pero no dice nada sobre los permisos *rwx*. Esto es util para indicar que solo se desea comprobar la existencia del archivo.
+
+
+### Ejercicio 2
+Para este ejercicio nos pedian implementar una aplicación que proporcione información sobre el número de líneas, palabras o caracteres que contiene un fichero de texto. Hemos hecho dos funciones una haciendo uso del método `pipe` de un `Stream` y otra sin hacer uso de este.
+
+En ambas funciones los parametros que se pasan como argumento son el fichero a analizar y las opciones (Información de lineas y/o palabras y/o caracteres además del fichero de nuevo). Al comienzo de las funciones lo primero que hacemos en ambas es comprobar que tenemos acceso al fichero con la función asincrona `access`. En caso de no tener acceso, se emite un mensaje de error y en caso de tener acceso al fichero si implementa la apliciacion según con `pipe` o no.
+
+#### wcConPipe
+Para esta función lo primero que hacemos es crear el proceso con `spawn`, en el que indicamos que queremos usar el comando `wc` con las opciones indicadas por parametros. A continuación, redirigimos la salida del proceso `wc` a la estandar de consola con un `pipe`.
+```typescript
+const wc = spawn('wc', options);
+wc.stdout.pipe(process.stdout);
+```
+
+#### wcSinPipe
+Para esta función lo primero que hacemos tambien será crear el proceso con `spawn`, en el que indicamos que queremos usar el comando `wc` con las opciones indicadas por parametros. A continuación, creamos la variable `wcOutput` que vamos a utilizar para ir almacenando el contenido del stream `wc`, con el evento `data`. Despues, con el evento `close`, separamos la variable `wcOutput` en un array para trabajar mejor y según las opciones seleccionadas imprimir la información del fichero.
+```typescript
+const wc = spawn('wc', options);
+
+let wcOutput: string = '';
+wc.stdout.on('data', (piece) => wcOutput += piece);
+
+wc.on('close', () => {
+  const wcOutputAsArray = wcOutput.split(/\s+/);
+  let position: number = 0;
+  if (wcOutputAsArray[0] == '') {
+    position = 1;
+  }
+
+  if (options.find(op => op === '-l')) {
+    console.log(`El fichero ${fichero}, tiene ${wcOutputAsArray[position++]} lineas`);
+  }
+  if (options.find(op => op === '-w')) {
+    console.log(`El fichero ${fichero}, tiene ${wcOutputAsArray[position++]} palabras`);
+  }
+  if (options.find(op => op === '-c')) {
+    console.log(`El fichero ${fichero}, tiene ${wcOutputAsArray[position]} caracteres`);
+  }
+
+  if(options.length === 1) {
+    console.log(`El fichero ${fichero}, tiene ${wcOutputAsArray[position++]} lineas`);
+    console.log(`El fichero ${fichero}, tiene ${wcOutputAsArray[position++]} palabras`);
+    console.log(`El fichero ${fichero}, tiene ${wcOutputAsArray[position]} caracteres`);
+  }
+});
+```
+
+#### index.ts
+En este fichero definiremos el código encargado de la interacción con el usuario a través de la línea de comandos, para ello vamos a hacer uso del paquete `yargs`.
+
+Definimos un comando que es `wc` y que pide un fichero `file` y como opcionales se pueden poner las opciones de `lines`, `words` y `chars`. Según las opciones indicadas, se incluyen en un vector para despues llamar a las funciones `wcConPipe` y `wcSinPipe`, con el fichero y las opciones seleccionadas.
 
 
 
