@@ -11,7 +11,7 @@ export function wcConPipe(fichero: string, options: string[]) {
     if (err) {
       console.log(`El fichero ${fichero} NO existe`);
     } else {
-      const wc = spawn('wc', options);
+      const wc = spawn('/usr/bin/wc', options);
       wc.stdout.pipe(process.stdout);
     }
   });
