@@ -1,5 +1,6 @@
 const chalk = require('chalk');
-import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync, rmSync,  } from 'fs';
+import { readFile, readdir, access, exists, writeFile, mkdir, rm, constants } from 'fs';
 import { Funko, GeneroFunko, TipoFunko } from "./funko";
 
 export class FunkoCollection {
@@ -14,7 +15,7 @@ export class FunkoCollection {
     this._usuario =  usuario;
     this._funkoCollection = [];
 
-    if (existsSync('./data/' + usuario)) {
+    /*if (existsSync('./data/' + usuario)) {
       const files = readdirSync('./data/' + usuario);
       files.forEach(funkoFile => {
         let data = readFileSync('./data/' + usuario + '/' + funkoFile, 'utf8');
@@ -23,7 +24,66 @@ export class FunkoCollection {
         let funko: Funko = new Funko (dataJson.ID, dataJson.nombre, dataJson.descripcion, dataJson.tipo, dataJson.genero, dataJson.franquicia, dataJson.numeroFranquicia, dataJson.exclusivo, dataJson.caractericticasEspeciales, dataJson.valorMercado);
         this._funkoCollection.push(funko);
       })
-    }
+    }*/
+
+    
+
+    /*access(('./data/' + usuario), constants.F_OK, (err) => {
+      console.log('1');
+      if (!err) {
+        const files = readdir('./data/' + usuario, (erro, files) => {  
+          console.log('2');
+
+          files.forEach(funkoFile => {
+           console.log('3');
+
+            readFile('./data/' + usuario + '/' + funkoFile, (error, data) => {
+              console.log('4');
+
+              let dataJson =  JSON.parse(data.toString());
+            
+              let funko: Funko = new Funko (dataJson.ID, dataJson.nombre, dataJson.descripcion, dataJson.tipo, dataJson.genero, dataJson.franquicia, dataJson.numeroFranquicia, dataJson.exclusivo, dataJson.caractericticasEspeciales, dataJson.valorMercado);
+              this._funkoCollection.push(funko);
+            });
+            
+          })
+        })
+      }
+    });*/
+  }
+
+  public initialize(callback: (error?: Error) => void) {
+    exists('./data/' + this._usuario, (exists) => {
+      if (exists) {
+        readdir('./data/' + this._usuario, (error, files) => {
+          if (error) {
+            return callback(error);
+          }
+
+          let count = 0;
+
+          for (const funkoFile of files) {
+            readFile('./data/' + this._usuario + '/' + funkoFile, 'utf8', (error, data) => {
+              if (error) {
+                return callback(error);
+              }
+
+              const dataJson = JSON.parse(data);
+              const funko: Funko = new Funko(dataJson.ID, dataJson.nombre, dataJson.descripcion, dataJson.tipo, dataJson.genero, dataJson.franquicia, dataJson.numeroFranquicia, dataJson.exclusivo, dataJson.caractericticasEspeciales, dataJson.valorMercado);
+              this._funkoCollection.push(funko);
+
+              count++;
+
+              if (count === files.length) {
+                return callback();
+              }
+            });
+          }
+        });
+      } else {
+        return callback();
+      }
+    });
   }
 
   /** 
@@ -52,9 +112,11 @@ export class FunkoCollection {
       this._funkoCollection.push(new Funko(ID, nombre, descripcion, tipo, genero, franquicia, numeroFranquicia, exclusivo, caracteristicasEspeciales, valorMercado));
       this.writeFunkoFile(ID, nombre, descripcion, tipo, genero, franquicia, numeroFranquicia, exclusivo, caracteristicasEspeciales, valorMercado);
       console.log(chalk.green(`Nuevo Funko ${nombre}, añadido a la coleccion de ${this._usuario}.`));
+      return true;
     }
     else {
       console.log(chalk.red(`Funko NO añadido a la coleccion de ${this._usuario}, YA existe.`));
+      return false;
     }
   }
 
@@ -101,7 +163,7 @@ export class FunkoCollection {
     let index: number = this.existeID(ID);
     if (index != -1) { // Existe el ID
       this._funkoCollection.splice(index, 1);
-      rmSync('./data/' + this._usuario + '/' + ID + '.json');
+      rm('./data/' + this._usuario + '/' + ID + '.json', () => {});
       console.log(chalk.green(`Funko eliminado de la coleccion de ${this._usuario}.`));
     }
     else {
@@ -165,9 +227,19 @@ export class FunkoCollection {
    */
   private writeFunkoFile(ID: number, nombre: string, descripcion: string, tipo: TipoFunko, genero: GeneroFunko, franquicia: string, numeroFranquicia: number, exclusivo: boolean, caracteristicasEspeciales: string, valorMercado: number) {
     let funkoToSave = {ID: ID, nombre: nombre, descripcion: descripcion, tipo: tipo, genero: genero, franquicia: franquicia, numeroFranquicia: numeroFranquicia, exclusivo: exclusivo, caractericticasEspeciales: caracteristicasEspeciales, valorMercado: valorMercado};
-    if (!existsSync('./data/' + this._usuario)) {
-      mkdirSync('./data/' + this._usuario);
-    }
-    writeFileSync('./data/' + this._usuario + '/' + ID + '.json', JSON.stringify(funkoToSave, null, 2),'utf8');
+    /*if (!access('./data/' + this._usuario)) {
+      mkdir('./data/' + this._usuario);
+    }*/
+    access(('./data/' + this._usuario), constants.F_OK, (err) => {
+      if (err) {
+        mkdir('./data/' + this._usuario, (err) => {
+          if (err) {
+              return console.error(err);
+          }
+          console.log('Directory created successfully!');
+        });
+      }
+    }); 
+    writeFile('./data/' + this._usuario + '/' + ID + '.json', JSON.stringify(funkoToSave, null, 2), () => {});
   }
 }

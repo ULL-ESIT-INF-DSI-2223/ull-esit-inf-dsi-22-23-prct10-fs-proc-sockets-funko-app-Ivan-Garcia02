@@ -1,8 +1,19 @@
 import * as net from 'net';
 
-const client = net.connect({port: 60300});
+export type RequestType = {
+  type: 'add' | 'update' | 'remove' | 'read' | 'list';
+}
+
+const client = net.connect({port: 60300}, () => {
+  client.write(JSON.stringify({'Nombre': 'ivan'}));
+});
 
 client.on('data', (dataJSON) => {
+  const message = JSON.parse(dataJSON.toString());
+  console.log('Mensaje: ' + message.Adios + message.Numero);
+})
+
+/*client.on('data', (dataJSON) => {
   const message = JSON.parse(dataJSON.toString());
 
   if (message.type === 'watch') {
@@ -14,4 +25,5 @@ client.on('data', (dataJSON) => {
   } else {
     console.log(`Message type ${message.type} is not valid`);
   }
-});
+});*/
+

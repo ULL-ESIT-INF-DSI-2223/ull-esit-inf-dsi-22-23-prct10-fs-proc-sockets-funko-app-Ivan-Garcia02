@@ -1,0 +1,12 @@
+{
+  "ID": 5,
+  "nombre": "Iron Man",
+  "descripcion": "Funko Pop del superheroe IronMan",
+  "tipo": "Pop!",
+  "genero": "Peliculas",
+  "franquicia": "Marvel",
+  "numeroFranquicia": 1,
+  "exclusivo": false,
+  "caractericticasEspeciales": "",
+  "valorMercado": 15.5
+}
