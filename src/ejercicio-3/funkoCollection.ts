@@ -6,6 +6,7 @@ import { Funko, GeneroFunko, TipoFunko } from "./funko";
 export class FunkoCollection {
   private _usuario: string;
   private _funkoCollection: Funko[];
+  public ready: boolean = false;
 
   /**
    * Constructor de la clase FunkoCollection
@@ -25,10 +26,8 @@ export class FunkoCollection {
         this._funkoCollection.push(funko);
       })
     }*/
-
-    
-
-    /*access(('./data/' + usuario), constants.F_OK, (err) => {
+    /*let count = 0;
+    access(('./data/' + usuario), constants.F_OK, (err) => {
       console.log('1');
       if (!err) {
         const files = readdir('./data/' + usuario, (erro, files) => {  
@@ -45,15 +44,15 @@ export class FunkoCollection {
               let funko: Funko = new Funko (dataJson.ID, dataJson.nombre, dataJson.descripcion, dataJson.tipo, dataJson.genero, dataJson.franquicia, dataJson.numeroFranquicia, dataJson.exclusivo, dataJson.caractericticasEspeciales, dataJson.valorMercado);
               this._funkoCollection.push(funko);
             });
-            
+            this.ready = true;
           })
         })
       }
     });*/
   }
 
-  public initialize(callback: (error?: Error) => void) {
-    exists('./data/' + this._usuario, (exists) => {
+  async initialize(callback: (error?: Error) => void) {
+    const ini= exists('./data/' + this._usuario, (exists) => {
       if (exists) {
         readdir('./data/' + this._usuario, (error, files) => {
           if (error) {
@@ -83,7 +82,11 @@ export class FunkoCollection {
       } else {
         return callback();
       }
+      console.log('das');
     });
+
+    await ini;
+    
   }
 
   /** 

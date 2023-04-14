@@ -2,7 +2,10 @@
   "entryPoints": [
     "./src/ejercicio-2/index.ts",
     "./src/ejercicio-2/wcConPipe.ts",
-    "./src/ejercicio-2/wcSinPipe.ts"
+    "./src/ejercicio-2/wcSinPipe.ts",
+    "./src/ejercicio-3/funko.ts",
+    "./src/ejercicio-3/cliente.ts",
+    "./src/ejercicio-3/servidor.ts"
   ],
   "out": "./docs" 
 }
