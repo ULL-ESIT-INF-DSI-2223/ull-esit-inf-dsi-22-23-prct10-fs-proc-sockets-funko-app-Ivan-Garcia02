@@ -139,15 +139,36 @@ Definimos un comando que es `wc` y que pide un fichero `file` y como opcionales 
 
 
 ### Ejercicio 3 - Cliente y servidor para aplicación de registro de Funko Pops
+Para este ejercicio nos pedían, que partiendo de la implementación de la practica anterior de *FunkoApp*, escribieramos un servidor y un cliente haciendo uso de los sockets proporcionados por el módulo net de Node.js. Por ello tenemos el fichero `funko.ts` que contiene la declaración de la clase `Funko` para declarar funkos.
+
+#### servidor.ts
+El servidor será el encargado de procesar la petición, preparar y envíar una respuesta de vuelta al cliente, es por ello que lo primero que hacemos es crear el servidor con `net.createServer((connection)` y ponernos a escuchar en el puerto correspondiente. A continuación, cuando recibamos un evento `data`, lo parseamos, y creamos el array de funkos a partir de los ficheros correspondientes al usuario de la petición, para ello usamos las funciones asincronas `access`, `readdir` y `readFile` y cuando estas hayan terminado de analizar todos los fichero e incluirlos a la colección de Funkos, emitiremos un evento con el tipo de petición a realizar:
+
+- **add:** Lo primero que haremos es parsear el mensaje, para si no existe el ID a inlcuir en la colección, crearlo y guardarlo en ficheros haciendo uso de la función `writeFunkoFile` que hara uso de las funciones asincronas `access`, `mkdir` y `writeFile`. A continuación, creamos la respuesta, la enviamos al cliente y cerramos la conexión con este. En caso de que el ID existiese mandamos un mensaje con el valor `sucess` a *false*.
+
+- **update:** Lo primero que haremos es parsear el mensaje, para si existe el ID a modificar en la colección, modificarlo y guardarlo en ficheros haciendo uso de la función `writeFunkoFile` que hara uso de las funciones asincronas `access`, `mkdir` y `writeFile`. A continuación, creamos la respuesta, la enviamos al cliente y cerramos la conexión con este. En caso de que el ID no existiese mandamos un mensaje con el valor `sucess` a *false*.
+
+- **remove:** Lo primero que haremos es parsear el mensaje, para si existe el ID a eliminar de la colección, eliminarlo de los ficheros haciendo uso de las función asincrona `rm`. A continuación, creamos la respuesta, la enviamos al cliente y cerramos la conexión con este. En caso de que el ID no existiese mandamos un mensaje con el valor `sucess` a *false*.
+
+- **show:** Lo primero que haremos es parsear el mensaje, para si existe el ID a mostrar de la colección, crear la respuesta en la que incluimos un array con el funko a mostrar y enviarlo al cliente y cerramos la conexión con este. En caso de que el ID no existiese mandamos un mensaje con el valor `sucess` a *false*.
+
+- **list:** Lo primero que haremos es parsear el mensaje, después creamos la respuesta en la que incluimos un array con los funkos a mostrar y enviarlos al cliente y cerramos la conexión con este.
+
+#### cliente.ts
+El cliente será el encargado de haciendo uso de `yargs`, se introduzcan todos los datos y el comando a ejecutar, para construir una petición y mandarsela al servidor. Para ello con `yargs` obtenemos todos los datos necesarios, al igual que en la practica anterior, para guardarlos en unas variable globales que usará el cliente.
+
+A continuación, creamos una conexión con el servidor con `net` y aprovechamos para desde la conexión, realizar un envío de datos al servidor con `write`, en la que en formato JSON enviamos la peticion que construimos en el yargs.
+
+Después, cuando reciba datos los irá almacenando en `wholeData`, para cuando el servidor emite un evento `end` y cierre la conexión el cliente parsea los datos recibidos y en un `switch-case` según el comando a ejecutar y si hubo exito o no, imprimir un mensaje personalizado de exito o no (haciendo uso de `chalk`) y en el caso de mostrar funkos imprimir los funkos tambien.
 
 
 ## Ejercicio Modificación
-En este ejercicio nos pedían escribir un servidor y un cliente haciendo uso de los sockets proporcionados por el módulo `net` de Node.js. De tal forma que el cliente hiciera una petición de un comando a ejecuatar al servidor, el servidor la ejecuta y le envia la salida del comando al cliente.
+En este ejercicio nos pedían escribir un servidor y un cliente haciendo uso de los sockets proporcionados por el módulo `net` de Node.js. De tal forma que el cliente hiciera una petición de un comando a ejecutar al servidor, el servidor la ejecuta y le envía la salida del comando al cliente.
 
 #### cliente.ts
-Para ello en el código del cliente, primero comprobamos que al menos recibimos 3 parametros (con el comando a ejecutar por el servidor). A continuación, creamos una conección con el servifor con `net` y aprovechamos para desde la conección, realizar un envio de datos al servidor con `write`, en la que en formato JSON enviamos el comando a ejecutar y sus opciones.
+Para ello en el código del cliente, primero comprobamos que al menos recibimos 3 parámetros (con el comando a ejecutar por el servidor). A continuación, creamos una conexión con el servidor con `net` y aprovechamos para desde la conexión, realizar un envío de datos al servidor con `write`, en la que en formato JSON enviamos el comando a ejecutar y sus opciones.
 
-A continuación, cuando reciba datos los ira almacenando en `wholeData`, para cuando el servidor emite un evento `end` y cierre la conección el cliente parsea los datos recibidos y los imprime por pantalla.
+A continuación, cuando reciba datos los irá almacenando en `wholeData`, para cuando el servidor emite un evento `end` y cierre la conexión el cliente parsea los datos recibidos y los imprime por pantalla.
 ```typescript
 if (process.argv.length < 3) {
   console.log('Por favor introduzca un comando.');
@@ -180,7 +201,7 @@ if (process.argv.length < 3) {
 ```
 
 #### servidor.ts
-En la parte del servidor lo primero que hacemos es crear el servidor con `net.createServer((connection)` y ponernos a escuchar el el puerto correspondiente. A continuación, cuando recibamos un evento `data`, lo parseamos, y creamos un proceso con `spawn` para ejecutarlo. Despues obtenemos la información de salida del comando y la enviamos al cliente con un `write` para a continuación, cerrar la conexión con el cliente `end`.
+En la parte del servidor lo primero que hacemos es crear el servidor con `net.createServer((connection)` y ponernos a escuchar en el puerto correspondiente. A continuación, cuando recibamos un evento `data`, lo parseamos, y creamos un proceso con `spawn` para ejecutarlo. Después obtenemos la información de salida del comando y la enviamos al cliente con un `write` para, a continuación, cerrar la conexión con el cliente `end`.
 ```typescript
 net.createServer((connection) => {
   console.log('A client has connected.');
@@ -211,7 +232,7 @@ net.createServer((connection) => {
 ## Conclusiones
 En esta práctica hemos realizado varios ejercicios con los que hemos practicado los conceptos explicados en clase, sobre Node.js, las APIs asíncronas de gestión del sistema de ficheros (módulo `fs`), de creación de procesos (módulo `child_process`) y de creación de sockets (módulo `net`) de Node.js. y los paquetes `yargs` y `chalk`.
 
-En concreto, he practicado más profundamente las funciones de la API asíncrona de Node.js, `writefile`, `readfile`, `access`, `mkdir` y `rm`. Ademas de los eventos a emitir por sockets `data`, `end`...
+En concreto, he practicado más profundamente las funciones de la API asíncrona de Node.js, `writefile`, `readfile`, `access`, `mkdir` y `rm`. Además de los eventos a emitir por sockets `data`, `end`...
 
 ## Bibliografía
 - [Guion de la práctica](https://ull-esit-inf-dsi-2223.github.io/prct10-fs-proc-sockets-funko-app/)
