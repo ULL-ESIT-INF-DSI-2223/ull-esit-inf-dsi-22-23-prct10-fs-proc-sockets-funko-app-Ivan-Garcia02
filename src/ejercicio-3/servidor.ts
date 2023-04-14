@@ -56,12 +56,12 @@ net.createServer((connection) => {
     if (existeID(funkoPops, peticion.ID) === -1) { // NO existe el ID
       writeFunkoFile(peticion.usuario, valores.ID, valores.nombre, valores.descripcion, valores.tipo, valores.genero, valores.franquicia, valores.numeroFranquicia, valores.exclusivo, valores.caracteristicasEspeciales, valores.valorMercado);
       let respuesta: ResponseType = {type: 'add', success: true};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
     else {
       let respuesta: ResponseType = {type: 'add', success: false};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
   });
@@ -76,12 +76,12 @@ net.createServer((connection) => {
     if (index !== -1) { // Existe el ID
       writeFunkoFile(peticion.usuario, valores.ID, valores.nombre, valores.descripcion, valores.tipo, valores.genero, valores.franquicia, valores.numeroFranquicia, valores.exclusivo, valores.caracteristicasEspeciales, valores.valorMercado);
       let respuesta: ResponseType = {type: 'update', success: true};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
     else {
       let respuesta: ResponseType = {type: 'update', success: false};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
   });
@@ -95,12 +95,12 @@ net.createServer((connection) => {
     if (index !== -1) { // Existe el ID
       rm('./data/' + peticion.usuario + '/' + peticion.ID + '.json', () => {});
       let respuesta: ResponseType = {type: 'remove', success: true};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
     else {
       let respuesta: ResponseType = {type: 'remove', success: false};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
   });
@@ -115,12 +115,12 @@ net.createServer((connection) => {
     if (index !== -1) { // Existe el ID
       let respuesta: ResponseType = {type: 'show', success: true};
       funkos.push({ID: funkoPops[index].ID, nombre: funkoPops[index].nombre, descripcion: funkoPops[index].descripcion, tipo: funkoPops[index].tipo, genero: funkoPops[index].genero, franquicia: funkoPops[index].franquicia, numeroFranquicia: funkoPops[index].numeroFranquicia, exclusivo: funkoPops[index].exclusivo, caracteristicasEspeciales: funkoPops[index].caracteristicasEspeciales, valorMercado: funkoPops[index].valorMercado});
-      connection.write(JSON.stringify({'respuesta': respuesta, 'funkos': funkos}));
+      connection.write(JSON.stringify({'respuesta': respuesta, 'funkos': funkos}) + '\n');
       connection.end();
     }
     else {
       let respuesta: ResponseType = {type: 'show', success: false};
-      connection.write(JSON.stringify({'respuesta': respuesta}));
+      connection.write(JSON.stringify({'respuesta': respuesta}) + '\n');
       connection.end();
     }
     });
@@ -135,7 +135,7 @@ net.createServer((connection) => {
         funkos.push({ID: funkoPops[i].ID, nombre: funkoPops[i].nombre, descripcion: funkoPops[i].descripcion, tipo: funkoPops[i].tipo, genero: funkoPops[i].genero, franquicia: funkoPops[i].franquicia, numeroFranquicia: funkoPops[i].numeroFranquicia, exclusivo: funkoPops[i].exclusivo, caracteristicasEspeciales: funkoPops[i].caracteristicasEspeciales, valorMercado: funkoPops[i].valorMercado});
       }
 
-      connection.write(JSON.stringify({'respuesta': respuesta, 'funkos': funkos}));
+      connection.write(JSON.stringify({'respuesta': respuesta, 'funkos': funkos}) + '\n');
       connection.end();
     });
 

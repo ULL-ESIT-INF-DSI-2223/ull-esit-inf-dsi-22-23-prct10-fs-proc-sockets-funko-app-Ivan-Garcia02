@@ -23,7 +23,7 @@
 - [Ejercicios propuestos](#ejercicios-propuestos)
   - [Ejercicio 1](#ejercicio-1)
   - [Ejercicio 2](#ejercicio-2)
-  - [Ejercicio 3]()
+  - [Ejercicio 3](#ejercicio-3---cliente-y-servidor-para-aplicación-de-registro-de-funko-pops)
 - [Ejercicio modificación](#ejercicio-modificación)
 - [Conclusiones](#conclusiones)
 - [Bibliografía](#bibliografía)
@@ -138,17 +138,80 @@ En este fichero definiremos el código encargado de la interacción con el usuar
 Definimos un comando que es `wc` y que pide un fichero `file` y como opcionales se pueden poner las opciones de `lines`, `words` y `chars`. Según las opciones indicadas, se incluyen en un vector para después llamar a las funciones `wcConPipe` y `wcSinPipe`, con el fichero y las opciones seleccionadas.
 
 
+### Ejercicio 3 - Cliente y servidor para aplicación de registro de Funko Pops
 
 
 ## Ejercicio Modificación
+En este ejercicio nos pedían escribir un servidor y un cliente haciendo uso de los sockets proporcionados por el módulo `net` de Node.js. De tal forma que el cliente hiciera una petición de un comando a ejecuatar al servidor, el servidor la ejecuta y le envia la salida del comando al cliente.
 
+#### cliente.ts
+Para ello en el código del cliente, primero comprobamos que al menos recibimos 3 parametros (con el comando a ejecutar por el servidor). A continuación, creamos una conección con el servifor con `net` y aprovechamos para desde la conección, realizar un envio de datos al servidor con `write`, en la que en formato JSON enviamos el comando a ejecutar y sus opciones.
 
+A continuación, cuando reciba datos los ira almacenando en `wholeData`, para cuando el servidor emite un evento `end` y cierre la conección el cliente parsea los datos recibidos y los imprime por pantalla.
+```typescript
+if (process.argv.length < 3) {
+  console.log('Por favor introduzca un comando.');
+} else {
+  let opciones: string[] = [];
+  for (let i = 3; i < process.argv.length; i++) {
+    opciones.push(process.argv[i]);
+  }
 
+  const client = net.connect({port: 60300}, () => {
+    client.write(JSON.stringify({'comando': process.argv[2], 'opciones': opciones}));
+  });
+
+  let wholeData = '';
+  client.on('data', (dataChunk) => { 
+    wholeData += dataChunk;
+  });
+
+  client.on('end', () => { 
+    const message = JSON.parse(wholeData);
+
+    if(message.flag) {
+      console.log('Salida del comando: \n' + message.salida);
+    }
+    else {
+      console.log('Error en el comando');
+    }
+  });
+}
+```
+
+#### servidor.ts
+En la parte del servidor lo primero que hacemos es crear el servidor con `net.createServer((connection)` y ponernos a escuchar el el puerto correspondiente. A continuación, cuando recibamos un evento `data`, lo parseamos, y creamos un proceso con `spawn` para ejecutarlo. Despues obtenemos la información de salida del comando y la enviamos al cliente con un `write` para a continuación, cerrar la conexión con el cliente `end`.
+```typescript
+net.createServer((connection) => {
+  console.log('A client has connected.');
+ 
+  connection.on('data', (dataJSON) => {
+    const message = JSON.parse(dataJSON.toString());
+    console.log('Comando a ejecutar: ' + message.comando + ' ' + message.opciones);
+
+    const comando = spawn(message.comando, message.opciones);
+    let comandoOutput = '';
+    comando.stdout.on('data', (piece) => comandoOutput += piece);
+  
+    comando.on('close', () => {
+      connection.write(JSON.stringify({'flag': true, 'salida': comandoOutput}));
+      connection.end();
+    });
+  });
+
+  connection.on('close', () => {
+    console.log('A client has disconnected.');
+  });
+}).listen(60300, () => {
+  console.log('Waiting for clients to connect.');
+});
+```
 
 
 ## Conclusiones
 En esta práctica hemos realizado varios ejercicios con los que hemos practicado los conceptos explicados en clase, sobre Node.js, las APIs asíncronas de gestión del sistema de ficheros (módulo `fs`), de creación de procesos (módulo `child_process`) y de creación de sockets (módulo `net`) de Node.js. y los paquetes `yargs` y `chalk`.
-En concreto, he practicado más profundamente las funciones de la API síncrona de Node.js, `writefile`, `readfile`, `exists`, `mkdir` y `rm`.
+
+En concreto, he practicado más profundamente las funciones de la API asíncrona de Node.js, `writefile`, `readfile`, `access`, `mkdir` y `rm`. Ademas de los eventos a emitir por sockets `data`, `end`...
 
 ## Bibliografía
 - [Guion de la práctica](https://ull-esit-inf-dsi-2223.github.io/prct10-fs-proc-sockets-funko-app/)

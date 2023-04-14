@@ -227,8 +227,13 @@ const client = net.connect({port: 60300}, () => {
   }
 });
 
-client.on('data', (dataJSON) => {
-  const message = JSON.parse(dataJSON.toString());
+let wholeData = '';
+client.on('data', (dataChunk) => {
+  wholeData += dataChunk;
+});
+
+client.on('end', () => {
+  const message = JSON.parse(wholeData);
   const respuesta: ResponseType = message.respuesta;
 
   switch (respuesta.type) {
